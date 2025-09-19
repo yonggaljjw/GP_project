@@ -1,0 +1,3 @@
+include:
+  - ./AI/docker-compose.yml
+  - ./WEB/docker-compose.yml
