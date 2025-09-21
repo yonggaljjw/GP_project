@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("org.apache.jasper.compiler.disablejsr199", "true");
 		SpringApplication.run(DemoApplication.class, args);
 	}
-
 }
