@@ -5,7 +5,7 @@ services:
     ports:
       - "${APP_PORT}:8080"
     env_file:
-      - ./.env
+      - ../.env
     environment:
       # Spring Boot 표준 환경변수 (properties 없이 오버라이드됨)
       SPRING_DATASOURCE_URL: "jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}"
