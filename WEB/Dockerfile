@@ -9,13 +9,13 @@ WORKDIR /app
 COPY pom.xml .
 
 # 의존성 미리 다운로드 (캐시 활용 → 이후 빌드 속도 개선)
-RUN mvn -q -DskipTests dependency:go-offline
+RUN mvn -q -DskipTests dependency:go-offline -Pdocker-war
 
 # 실제 소스 코드 복사
 COPY src ./src
 
 # 테스트 생략하고 빌드 → target/*.war 생성됨
-RUN mvn -q -DskipTests clean package
+RUN mvn -q -DskipTests clean package -Pdocker-war
 
 
 # ---------- Run Stage ----------
