@@ -1,0 +1,26 @@
+:root{
+  --bg:#F6F8FB; --panel:#FFFFFF; --line:#E5E7EB; --text:#0F172A; --muted:#6B7280;
+  --brand:#2563EB; --brand-2:#1E40AF; --ok:#16A34A; --warn:#F59E0B; --bad:#EF4444;
+  --chip:#EEF2FF; --chip-text:#3730A3;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+}
+a{color:var(--brand); text-decoration:none} a:hover{color:var(--brand-2)}
+.container{max-width:1400px;margin:20px auto;padding:0 20px}
+.muted{color:var(--muted);font-size:13px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.row,.twocol{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+@media (max-width:1100px){ .row,.twocol{grid-template-columns:1fr} }
+@media (max-width:900px){ .grid-3{grid-template-columns:1fr} }
+
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  /* 이 줄을 교체: 이모지 폰트 3종 추가 */
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",
+               "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+}
+
