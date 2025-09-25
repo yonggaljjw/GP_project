@@ -1,0 +1,76 @@
+/* Card */
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px }
+.card h3{ margin:0 0 10px; font-size:16px }
+
+/* KPI */
+.kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px }
+.kpi{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px }
+.kpi .label{ font-size:12px; color:var(--muted) }
+.kpi .num{ font-size:22px; font-weight:800; margin-top:6px }
+.ok{ border-color:#DCFCE7 } .warn{ border-color:#FEF3C7 } .bad{ border-color:#FEE2E2 }
+
+/* Lists */
+.list{ display:flex; flex-direction:column; gap:10px }
+.item, .rowline{ border:1px solid var(--line); border-radius:10px; padding:10px; background:#fff }
+.item{ display:flex; align-items:center; justify-content:space-between }
+.rowline{ display:grid; grid-template-columns:100px 1fr 100px 200px; gap:10px; align-items:center }
+
+/* Chip & links */
+.chip{ background:var(--chip); color:var(--chip-text); border-radius:999px; padding:6px 10px; font-size:12px }
+.links a{ margin-left:8px }
+
+/* Map & chart */
+.mapbox, .chartbox{ height:340px; border:1px dashed var(--line); border-radius:12px }
+.mapbox{ background:linear-gradient(180deg,#FAFBFF,#F2F5FF) }
+.chartbox{ display:flex; align-items:center; justify-content:center }
+
+/* Route cards */
+.routes{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+.route{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px }
+.route h4{ margin:0 0 6px }
+.meta{ display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#111827; font-size:14px }
+.meta .muted{ font-size:12px }
+.route .footer{ margin-top:8px }
+.route .btn{ width:100% }
+.route-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px }
+
+/* Customer actions */
+.actions{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 20px }
+.btn.outline{ border-style:dashed; border-color:#D1D5DB; background:#F9FAFB; color:#374151 }
+.btn.primary.soft{ background:#EFF6FF; color:var(--brand); border-color:var(--brand) }
+
+/* === Agent Dock (공통) === */
+.agent-dock{
+  position:fixed; left:20px; bottom:20px; width:380px; max-height:70vh;
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  box-shadow:0 12px 30px rgba(2,6,23,.18); overflow:hidden; display:flex; flex-direction:column;
+  transition:transform .2s ease, opacity .2s ease; z-index:10000;
+}
+.agent-dock.collapsed{ transform:translateY(10px); opacity:0; pointer-events:none; }
+.dock-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px;
+  border-bottom:1px solid var(--line); background:#F8FAFC; }
+.dock-head .title{ font-weight:800; color:var(--brand-2); }
+.icon-btn{ border:none; background:transparent; cursor:pointer; font-size:16px; margin-left:6px; }
+.dock-body{ display:flex; flex-direction:column; height:100%; }
+.msg-list{ padding:12px; overflow:auto; gap:10px; display:flex; flex-direction:column; min-height:160px; }
+.msg{ display:flex; gap:8px; }
+.msg .avatar{ width:28px; height:28px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.msg.user  .avatar{ background:#DBEAFE; color:#1E3A8A; }
+.msg.agent .avatar{ background:#DCFCE7; color:#065F46; }
+.bubble{ max-width:78%; padding:8px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; }
+.msg.user  .bubble{ background:#F0F9FF; border-color:#DBEAFE; }
+.msg.agent .bubble{ background:#F0FFF4; border-color:#DCFCE7; }
+.typing{ font-size:12px; color:#64748B; padding-left:36px; }
+.quick-prompts{ display:flex; gap:8px; padding:0 12px 8px; flex-wrap:wrap;}
+.quick-prompts .chip{ background:#EEF2FF; color:#3730A3; border:none; border-radius:999px; padding:6px 10px; cursor:pointer; }
+.composer{ display:flex; gap:8px; padding:10px; border-top:1px solid var(--line); }
+#chatInput{ flex:1; resize:none; border:1px solid var(--line); border-radius:10px; padding:10px; font-family:inherit; }
+.send-btn{ background:var(--brand); color:#fff; border:none; border-radius:10px; padding:0 14px; font-weight:700; cursor:pointer; }
+.dock-fab{
+  position:fixed; left:20px; bottom:20px; width:54px; height:54px; border-radius:999px;
+  border:none; background:var(--brand); color:#fff; font-size:22px; cursor:pointer; z-index:9999;
+  box-shadow:0 10px 24px rgba(2,6,23,.22);
+}
+@media (max-width: 780px){
+  .agent-dock{ left:10px; right:10px; width:auto; max-height:65vh; }
+}
