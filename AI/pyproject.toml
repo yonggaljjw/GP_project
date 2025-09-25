@@ -7,16 +7,22 @@ requires-python = ">=3.12"
 
 dependencies = [
     "python-dotenv",
+    "langchain",
     "langchain-openai",
     "langgraph",
     "langchain-mcp-adapters",
+    "langchain-community",
+    "langchain-elasticsearch",
     "mcp[cli]",
     "pandas",
     "numpy",
     "nest_asyncio",
     "fastapi",
     "uvicorn",
-    "pyyaml"
+    "pyyaml",
+    "sqlalchemy",
+    "aiomysql",
+    "cryptography"
 ]
 
 [tool.uv]
