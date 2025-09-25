@@ -42,10 +42,3 @@ async def get_agent_and_client():
     except Exception as e:
         print(f"⚠️ MCP connection failed: {e}")
         return create_react_agent(model, []), None
-
-
-async def run_query(user_input: str):
-    """사용자 입력을 받아 Agent 실행"""
-    agent, client = await get_agent_and_client()
-    response = await agent.ainvoke({"messages": user_input})
-    return response

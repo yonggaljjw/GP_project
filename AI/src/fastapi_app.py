@@ -1,10 +1,6 @@
 from fastapi import FastAPI
-from src.agent import run_query
 import asyncio
+from src.router import router as chat_router
 
 app = FastAPI()
-
-@app.get("/query")
-async def query_agent(q: str):
-    result = await run_query(q)
-    return {"query": q, "result": result}
+app.include_router(chat_router, prefix="/api")
