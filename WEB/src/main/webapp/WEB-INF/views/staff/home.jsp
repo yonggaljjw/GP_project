@@ -5,7 +5,6 @@
   <jsp:param name="pageTitle" value="대시보드"/>
   <jsp:param name="brand" value="이동점포 · 직원 대시보드"/>
   <jsp:param name="active" value="dashboard"/>
-  <jsp:param name="pageCss" value="/resources/static/css/staff.css"/>
 </jsp:include>
 
 <!-- 지역 선택 필터 -->

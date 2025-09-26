@@ -5,7 +5,6 @@
   <jsp:param name="pageTitle" value="사후관리"/>
   <jsp:param name="brand" value="이동점포 · 사후관리"/>
   <jsp:param name="active" value="aftercare"/>
-  <jsp:param name="pageCss" value="/resources/static/css/staff.css"/>
 </jsp:include>
 
 <!-- 상단 지표 -->
