@@ -5,7 +5,6 @@
   <jsp:param name="pageTitle" value="경로 추천"/>
   <jsp:param name="brand" value="이동점포 · 경로 추천"/>
   <jsp:param name="active" value="routes"/>
-  <jsp:param name="pageCss" value="/resources/static/css/staff.css"/>
 </jsp:include>
 
 <!-- 상단: 추천 경로 맵 + 경로별 요약 -->
