@@ -110,11 +110,37 @@
 <!-- 간단 Placeholder 스크립트 -->
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
-  // 수요 차트 placeholder
-  const dc=document.getElementById('demandChart'); if(dc){const x=dc.getContext('2d'); x.fillStyle='#2563EB33'; x.fillRect(40,220,40,-80); x.fillRect(120,220,40,-120); x.fillRect(200,220,40,-60); x.fillRect(280,220,40,-160); x.fillRect(360,220,40,-100);}
-  // 포용지수 차트 placeholder
-  const ic=document.getElementById('inclusionChart'); if(ic){const ctx=ic.getContext('2d'); ctx.beginPath(); ctx.moveTo(40,240); [100,180,160,120,200,100,360,180].forEach((v,i)=>{ if(i%2===0) ctx.lineTo(v, arguments[0][i+1]);}); ctx.strokeStyle='#2563EB'; ctx.lineWidth=2; ctx.stroke();}
+  // 수요 차트 placeholder (그대로 OK)
+
+  // 포용지수 차트 placeholder — 수정본
+  const ic=document.getElementById('inclusionChart');
+  if(ic){
+    const ctx=ic.getContext('2d');
+    const pts=[40,240, 100,180, 160,120, 200,100, 360,180]; // x,y 반복
+    ctx.beginPath(); ctx.moveTo(pts[0],pts[1]);
+    for(let i=2;i<pts.length;i+=2){ ctx.lineTo(pts[i],pts[i+1]); }
+    ctx.strokeStyle='#2563EB'; ctx.lineWidth=2; ctx.stroke();
+  }
 });
 </script>
+
+
+<!-- Leaflet (CDN) -->
+<link rel="stylesheet" href="<c:url value='/vendor/leaflet/1.9.4/leaflet.css'/>">
+<script defer src="<c:url value='/vendor/leaflet/1.9.4/leaflet.js'/>"></script>
+
+<script defer src="<c:url value='/vendor/proj4/proj4.js'/>"></script>
+
+<!-- 대시보드 맵 전용 설정 (GeoJSON 경로 전달) -->
+<link rel="stylesheet" href="<c:url value='/css/dashboard-map.css'/>?v=${applicationScope.staticVer}">
+
+<script>window.clusterGeoUrl = '<c:url value="/data/clustered_data.geojson"/>';
+  // 대시보드 JSP의 지도 스크립트 로드 전에 넣기
+  window.clusterField = 'k_weight_clustering_New_Weighted_KMeans_Cluster';       // <-- 팀원 파일의 클러스터 컬럼명
+  window.nameField    = 'SIGUNGU_NM';   // <-- 지역명 컬럼명
+  // (선택) 숫자 클러스터를 A/B/C/D로 보이고 싶으면 매핑
+  window.clusterLabelMap = {'0':'A','1':'B','2':'C','3':'D', 0:'A',1:'B',2:'C',3:'D'};
+</script>
+<script defer src="<c:url value='/js/dashboard-map.js'/>?v=${applicationScope.staticVer}"></script>
 
 <jsp:include page="/WEB-INF/views/layout/end-staff.jsp"/>
