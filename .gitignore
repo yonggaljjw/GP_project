@@ -35,4 +35,4 @@ build/
 .env
 servers.json
 # 대용량 geojson 파일 제외
-WEB/src/main/resources/static/data/clustered_data.geojson
+.src/main/resources/static/data/clustered_data.geojson
