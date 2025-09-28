@@ -7,6 +7,7 @@ from src.memory import get_memory
 from src.title_generator import generate_title
 from src.database import AsyncSessionLocal
 from src.crud import create_chatroom
+from src.report_generator import full_pipeline
 
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, BaseMessage
@@ -159,3 +160,9 @@ async def get_chat_history(user_id: int, chat_id: int):
         {"role": msg.type, "content": msg.content}
         for msg in history
     ]
+
+@router.post("/report")
+async def generator_report():
+
+    report = await full_pipeline()
+    return {"report": report}
