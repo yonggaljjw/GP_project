@@ -22,7 +22,9 @@ dependencies = [
     "pyyaml",
     "sqlalchemy",
     "aiomysql",
-    "cryptography"
+    "cryptography",
+    "pymysql",
+    "sqlalchemy"
 ]
 
 [tool.uv]
