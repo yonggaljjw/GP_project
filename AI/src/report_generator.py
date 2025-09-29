@@ -10,6 +10,9 @@ import pymysql
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain.output_parsers import PydanticOutputParser
+from pydantic import BaseModel
+from typing import List
 
 # ------------------------
 # 환경변수 로드
@@ -32,8 +35,75 @@ model = ChatOpenAI(model="gpt-4o")
 
 
 # ------------------------
-# MCP 서버 설정 로드
+# 단계 1: 데이터 분석
 # ------------------------
+class AnalyzeResult(BaseModel) :
+    region : str
+    features : str
+    score : int
+
+class AnalyzeResults(BaseModel):
+    results: List[AnalyzeResult]
+
+parser = PydanticOutputParser(pydantic_object=AnalyzeResults)
+
+async def analyze_data(df: pd.DataFrame, batch_size: int = 50):
+    results: List[AnalyzeResult] = []
+
+    for i in range(0, len(df), batch_size):
+        batch = df.iloc[i:i+batch_size]
+
+        # 프롬프트 정의
+        prompt = ChatPromptTemplate.from_template(
+            """
+            너는 데이터 분석가다.  
+            목표는 "은행 이동점포 운영계획" 수립을 위한 기초 분석이다.  
+
+            [데이터 설명]  
+            - 독립변수: {columns}  
+            - 데이터 샘플(이 배치에 포함된 시군구): {sample}  
+            - 참고: Cluster는 K-means로 유형화한 값이며, traffic_infra는 전체면적 대비 대중교통 비중을 의미한다.  
+
+            [요청]  
+            1. 각 행정구역(region)에 대해 금융취약성 정도를 0~100 사이 정수(score)로 평가하라.  
+            2. 점수 산정 근거(reason)를 간략히 요약하라.  
+            3. 반드시 아래 JSON 스키마를 따를 것.  
+
+            [출력 형식]  
+            {format_instructions}
+            - 출력은 반드시 순수 JSON만 포함해야 한다.
+            - 주석(//, # 등) 금지
+            - 불필요한 설명 문장 금지
+            - 잘린 객체 없이 완전한 JSON으로 출력
+            - 모든 객체는 region, features, score 세 필드를 반드시 가져야 함
+            """
+        ).partial(
+            columns=list(df.columns),
+            sample=batch.to_dict(orient="records"),
+            format_instructions=parser.get_format_instructions(),
+        )
+
+        chain = prompt | model | parser
+
+        try:
+            batch_result: AnalyzeResults = await chain.ainvoke({})
+            print(f"✅ 배치 {i//batch_size+1} 처리 완료 ({len(batch_result.results)}개)")
+            results.extend(batch_result.results)
+        except Exception as e:
+            print(f"❌ 배치 {i//batch_size+1} 처리 실패:", e)
+
+    # DataFrame 변환
+    df_result = pd.DataFrame([r.dict() for r in results])
+    print(f"총 {len(df_result)}개 행정구역 결과 반환")
+    return df_result
+
+
+# ------------------------
+# 단계 2: MCP 보조 호출 (DeepResearch + Kakao Navigation with Distance)
+# ------------------------
+
+
+# MCP 서버 설정 로드
 async def load_servers_config(file_path: str = "src/report_server.json") -> dict:
     path = Path(file_path)
     if not path.exists():
@@ -41,40 +111,11 @@ async def load_servers_config(file_path: str = "src/report_server.json") -> dict
 
     with path.open("r", encoding="utf-8") as f:
         return json.load(f).get("mcpServers", {})
-
-
-# ------------------------
-# 단계 1: 데이터 분석
-# ------------------------
-async def analyze_data(df: pd.DataFrame):
-    prompt = ChatPromptTemplate.from_template(
-        """
-        너는 데이터 분석가다.
-
-        [데이터 설명]
-        - 독립변수: {columns}
-        - 데이터 샘플: {sample}
-
-        [요청]
-        - Cluster별 지역적 특성과 주요 지표 특징을 정리할 것
-        - 각 Cluster를 해석하여 '금융취약지역 후보' 여부를 도출할 것
-        - 최종 반환은 반드시 JSON 배열 형식만 출력하라.
-        """
-    ).partial(
-        columns=list(df.columns),
-        sample=df.to_dict()  # 전체 대신 샘플만 전달 (토큰 절약)
-    )
-
-    response = await model.ainvoke(prompt.format())
-    result_message = response.content.replace("```json","").replace("```","").strip()
-    print(result_message)
-    return result_message
-
-
-# ------------------------
-# 단계 2: MCP 보조 호출 (DeepResearch + Kakao Navigation with Distance)
-# ------------------------
-async def enrich_with_mcp(candidates: str, base_location: str = "서울역"):
+    
+async def enrich_with_mcp(candidates: list, base_location: str = "서울역"):
+    """
+    candidates: List[dict] (예: [{"region": "...", "score": 85, "reason": "..."}])
+    """
     servers = await load_servers_config()
     if not servers:
         return candidates
@@ -85,10 +126,9 @@ async def enrich_with_mcp(candidates: str, base_location: str = "서울역"):
     deep_tool = next((t for t in tools if t.name == "DeepResearchMCP"), None)
     nav_tool = next((t for t in tools if t.name == "kakao-navigation-mcp-server"), None)
 
-    results = []
-    parsed = json.loads(candidates)
+    enriched = []
 
-    for cand in parsed:
+    for cand in candidates:
         region = cand.get("region")
 
         # DeepResearchMCP 호출
@@ -96,7 +136,7 @@ async def enrich_with_mcp(candidates: str, base_location: str = "서울역"):
             deep_res = await client.run_tool(
                 "DeepResearchMCP",
                 {"query": f"{region} 지역의 금융 취약성 및 사회경제적 특징"}
-            )
+            ) or {}
             cand["deep_research"] = deep_res.get("output", "N/A")
 
         # Kakao Navigation MCP 호출 → 거리/시간 포함
@@ -104,13 +144,14 @@ async def enrich_with_mcp(candidates: str, base_location: str = "서울역"):
             nav_res = await client.run_tool(
                 "kakao-navigation-mcp-server",
                 {"origin": base_location, "destination": region}
-            )
+            ) or {}
             cand["navigation_info"] = nav_res.get("output", "N/A")
 
-        results.append(cand)
+        enriched.append(cand)
 
-    print(results)
-    return json.dumps(results, ensure_ascii=False)
+    print(enriched)
+    return enriched
+
 
 
 # ------------------------
@@ -154,15 +195,14 @@ async def generate_report(enriched_data: str):
         - 기업 보고서 형식(마크다운)으로 작성.
         - 반드시 '방문 순서, 지역명, 근거(금융취약성 + 거리/이동시간)'를 포함할 것.
         - 문단은 [개요] [분석 요약] [지역별 운영 전략 제안] [결론] 으로 구분할 것.
+        - 전략제안 부분은 표 형태로 제시할 것
         """
     ).partial(
         enriched=enriched_data,
         seq=seq_result or "순차적 사고 결과 없음"
     )
 
-    response = await model.ainvoke(prompt.format())
-
-    print(response)
+    response = await (prompt | model).ainvoke({})
     return response.content
 
 # ------------------------
@@ -170,12 +210,13 @@ async def generate_report(enriched_data: str):
 # ------------------------
 async def full_pipeline():
     # 1단계: 데이터 분석
-    candidates = await analyze_data(cluster_data)
+    candidates_df = await analyze_data(cluster_data, batch_size=50)
+    candidates = candidates_df.to_dict(orient="records")
 
     # 2단계: MCP 보강
     enriched = await enrich_with_mcp(candidates)
 
     # 3단계: Sequential Thinking + 보고서 생성
-    report = await generate_report(enriched)
+    report = await generate_report(json.dumps(enriched, ensure_ascii=False))
 
     return report
