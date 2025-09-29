@@ -136,10 +136,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 <script>window.clusterGeoUrl = '<c:url value="/data/clustered_data.geojson"/>';
   // 대시보드 JSP의 지도 스크립트 로드 전에 넣기
-  window.clusterField = 'k_weight_clustering_New_Weighted_KMeans_Cluster';       // <-- 팀원 파일의 클러스터 컬럼명
+  window.clusterField = 'clustered_data_final_cluster';       // <-- 팀원 파일의 클러스터 컬럼명
   window.nameField    = 'SIGUNGU_NM';   // <-- 지역명 컬럼명
   // (선택) 숫자 클러스터를 A/B/C/D로 보이고 싶으면 매핑
-  window.clusterLabelMap = {'0':'A','1':'B','2':'C','3':'D', 0:'A',1:'B',2:'C',3:'D'};
+  window.clusterLabelMap = {'0':'위험','1':'적정','2':'양호',0:'위험',1:'적정',2:'양호'};
 </script>
 <script defer src="<c:url value='/js/dashboard-map.js'/>?v=${applicationScope.staticVer}"></script>
 

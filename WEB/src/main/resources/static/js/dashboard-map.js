@@ -58,17 +58,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // ---- 3) 스타일/라벨 (간단 고정 버전)
       // ※ 당신 데이터 기준: 클러스터 = "k_weight_clustering_New_Weighted_KMeans_Cluster" 또는 "k_weight_clustering_Final_Cluster"
-      const CLUSTER_FIELD = window.clusterField || 'k_weight_clustering_New_Weighted_KMeans_Cluster';
+      const CLUSTER_FIELD = window.clusterField || 'clustered_data_final_cluster';
       const NAME_FIELD    = window.nameField    || 'SIGUNGU_NM';
-      const LABEL_MAP     = window.clusterLabelMap || {'0':'A','1':'B','2':'C','3':'D', 0:'A',1:'B',2:'C',3:'D'};
-      const COLORS        = { A:'#2563EB', B:'#10B981', C:'#F59E0B', D:'#EF4444' };
+      const LABEL_MAP     = window.clusterLabelMap || {'0':'위험','1':'적정','2':'양호',0:'위험',1:'적정',2:'양호'};
+      const COLORS        = { '위험':'#EF4444', '적정':'#2563EB', '양호':'#F59E0B'};
 
       const getLabel = (p) => {
         let v = p[CLUSTER_FIELD];
-        if (v == null) return 'A';
+        if (v == null) return '위험';
         const key = (v in LABEL_MAP) ? v : String(v).trim();
         if (key in LABEL_MAP) return LABEL_MAP[key];
-        return (/^\d+$/.test(key) ? (LABEL_MAP[key] || 'A') : key.toUpperCase());
+        return (/^\d+$/.test(key) ? (LABEL_MAP[key] || '위험') : key.toUpperCase());
       };
 
       const layer = L.geoJSON(geo, {
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
         onEachFeature: (f, lyr) => {
           const name = (f.properties && f.properties[NAME_FIELD]) || '지역';
           const lab  = getLabel(f.properties || {});
-          lyr.bindTooltip(`${name} · Cluster ${lab}`, { sticky:true });
+          lyr.bindTooltip(`${name} · ${lab}`, { sticky:true });
           lyr.on('click', () => { try { map.fitBounds(lyr.getBounds(), { padding:[10,10] }); } catch(e){} });
         }
       }).addTo(map);
@@ -92,10 +92,10 @@ document.addEventListener('DOMContentLoaded', function () {
       legend.onAdd = () => {
         const div = L.DomUtil.create('div', 'legend');
         div.style.cssText = 'background:#fff;padding:8px 10px;border:1px solid #E5E7EB;border-radius:8px;font:12px system-ui;';
-        div.innerHTML = '<b>Cluster</b><br>' +
-          ['A','B','C','D'].map(k =>
-            `<span style="display:inline-block;width:10px;height:10px;background:${COLORS[k]};border:1px solid #ccc;margin-right:6px"></span>${k}`
-          ).join('<br>');
+        const ORDER = ['위험','적정','양호'];                 // ← 한국어 라벨 순서
+        div.innerHTML = '<b>등급</b><br>' + ORDER.map(k =>
+          `<span style="display:inline-block;width:10px;height:10px;background:${COLORS[k]};border:1px solid #ccc;margin-right:6px"></span>${k}`
+        ).join('<br>');
         return div;
       };
       legend.addTo(map);
