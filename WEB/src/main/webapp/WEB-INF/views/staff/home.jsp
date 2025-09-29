@@ -7,6 +7,16 @@
   <jsp:param name="active" value="dashboard"/>
 </jsp:include>
 
+<!-- 그리드/카드 전용 스타일 -->
+<style>
+  .viz-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .viz-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px;height:320px;display:flex;flex-direction:column}
+  .viz-card h4{margin:0 0 6px;font-size:14px;color:#374151;font-weight:700}
+  .viz-body{position:relative;flex:1;border:1px dashed #E5E7EB;border-radius:10px;background:#FAFAFF}
+  .viz-body canvas{position:absolute;inset:0;width:100% !important;height:100% !important}
+  @media (max-width:1100px){ .viz-grid{grid-template-columns:1fr} .viz-card{height:300px} }
+</style>
+
 <!-- 지역 선택 필터 -->
 <form class="filters" method="get" action="${pageContext.request.contextPath}/staff">
   <input class="input" type="search" name="q" placeholder="지역(시/군/구) 검색" value="${param.q}">
@@ -32,7 +42,7 @@
 </form>
 
 <!-- 상단 4블록 -->
-<div class="row">
+<div class="row split-50">
   <!-- 지역 군집화 -->
   <section class="card">
     <h3>지역 군집화</h3>
@@ -49,8 +59,27 @@
 
   <!-- 수요 데이터 시각화 -->
   <section class="card">
-    <h3>수요 데이터 시각화</h3>
-    <div class="chartbox"><canvas id="demandChart" width="420" height="280" aria-label="수요 차트"></canvas></div>
+    <h3 style="margin-bottom:10px;">수요 데이터 시각화</h3>
+
+    <!-- 2×2 그리드 -->
+    <div class="viz-grid">
+      <div class="viz-card">
+        <h4>지역별 신청 Top10</h4>
+        <div class="viz-body"><canvas id="chartRegion"></canvas></div>
+      </div>
+      <div class="viz-card">
+        <h4>목적 구성비</h4>
+        <div class="viz-body"><canvas id="chartPurpose"></canvas></div>
+      </div>
+      <div class="viz-card">
+        <h4>교차(지역×목적)</h4>
+        <div class="viz-body"><canvas id="chartCross"></canvas></div>
+      </div>
+      <div class="viz-card">
+        <h4>최근 2주 추이</h4>
+        <div class="viz-body"><canvas id="chartTrend"></canvas></div>
+      </div>
+    </div>
   </section>
 </div>
 
@@ -124,6 +153,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 </script>
 
+<!-- Chart.js + 데모 스크립트 -->
+<script defer src="<c:url value='/vendor/chartjs/chart.umd.js'/>"></script>
+<script defer src="<c:url value='/js/demand-viz-demo.js'/>?v=${applicationScope.staticVer}"></script>
 
 <!-- Leaflet (CDN) -->
 <link rel="stylesheet" href="<c:url value='/vendor/leaflet/1.9.4/leaflet.css'/>">
