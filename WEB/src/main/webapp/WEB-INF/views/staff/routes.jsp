@@ -1,6 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+<head>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/vendor/leaflet/1.9.4/leaflet.css" />
+    <script src="${pageContext.request.contextPath}/vendor/leaflet/1.9.4/leaflet.js"></script>
+</head>
+
+<script src="${pageContext.request.contextPath}/js/route-map.js"></script>
+
 <jsp:include page="/WEB-INF/views/layout/start-staff.jsp">
   <jsp:param name="pageTitle" value="경로 추천"/>
   <jsp:param name="brand" value="이동점포 · 경로 추천"/>
